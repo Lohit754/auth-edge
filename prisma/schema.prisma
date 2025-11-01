@@ -1,0 +1,45 @@
+// Prisma schema for SentinelAuth
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  roleId        String?
+  role          Role?          @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+
+  @@index([roleId])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  permissions String // JSON string[] - must be subset of PERMISSIONS constant
+  users       User[]   // Prisma requires this reverse relation field (not used in code)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model RefreshToken {
+  id        String    @id // jti (JWT ID)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hash      String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
