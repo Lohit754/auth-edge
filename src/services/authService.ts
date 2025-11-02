@@ -84,10 +84,18 @@ export async function register(input: RegisterInput) {
       email: true,
       createdAt: true,
       updatedAt: true,
+      role: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
-  return user;
+  return {
+    ...user,
+    role: user.role?.name,
+  };
 }
 
 /**

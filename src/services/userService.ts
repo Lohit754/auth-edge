@@ -99,11 +99,10 @@ export async function getUserById(userId: string) {
 export async function listUsers(options?: { search?: string }) {
   const where: any = {};
 
-  // Add email search filter
+  // Add email search filter (SQLite doesn't support mode: 'insensitive')
   if (options?.search) {
     where.email = {
       contains: options.search,
-      mode: 'insensitive',
     };
   }
 

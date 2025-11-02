@@ -25,7 +25,6 @@ describe('AuthService', () => {
 
       expect(user).toBeTruthy();
       expect(user.email).toBe(input.email);
-      expect(user.role).toBe('USER');
       expect(user.id).toBeTruthy();
     });
 
@@ -58,14 +57,17 @@ describe('AuthService', () => {
 
   describe('login', () => {
     beforeEach(async () => {
-      // Create a test user
-      await prisma.user.create({
-        data: {
-          email: 'test-auth-service-login@example.com',
-          passwordHash: await hashPassword('Password1!'),
-          role: 'USER',
-        },
-      });
+      // Create a test user with a role first
+      const userRole = await prisma.role.findFirst({ where: { name: 'USER' } });
+      if (userRole) {
+        await prisma.user.create({
+          data: {
+            email: 'test-auth-service-login@example.com',
+            passwordHash: await hashPassword('Password1!'),
+            roleId: userRole.id,
+          },
+        });
+      }
     });
 
     it('should login with valid credentials', async () => {

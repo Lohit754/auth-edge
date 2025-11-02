@@ -32,7 +32,7 @@ export async function getAllRoles(): Promise<RoleWithPermissions[]> {
 
   return roles.map((role) => ({
     ...role,
-    permissions: role.permissions as string[] as PermissionKey[],
+    permissions: JSON.parse(role.permissions) as PermissionKey[],
   }));
 }
 
@@ -50,7 +50,7 @@ export async function getRoleById(id: string): Promise<RoleWithPermissions | nul
 
   return {
     ...role,
-    permissions: role.permissions as string[] as PermissionKey[],
+    permissions: JSON.parse(role.permissions) as PermissionKey[],
   };
 }
 
@@ -68,7 +68,7 @@ export async function getRoleByName(name: string): Promise<RoleWithPermissions |
 
   return {
     ...role,
-    permissions: role.permissions as string[] as PermissionKey[],
+    permissions: JSON.parse(role.permissions) as PermissionKey[],
   };
 }
 
@@ -99,13 +99,13 @@ export async function createRole(input: CreateRoleInput): Promise<RoleWithPermis
   const role = await prisma.role.create({
     data: {
       name,
-      permissions: validatedPermissions as any,
+      permissions: JSON.stringify(validatedPermissions),
     },
   });
 
   return {
     ...role,
-    permissions: role.permissions as string[] as PermissionKey[],
+    permissions: JSON.parse(role.permissions) as PermissionKey[],
   };
 }
 
@@ -145,7 +145,7 @@ export async function updateRole(
 
   if (input.permissions !== undefined) {
     const validatedPermissions = validatePermissions(input.permissions);
-    updateData.permissions = validatedPermissions as any;
+    updateData.permissions = JSON.stringify(validatedPermissions);
   }
 
   // Update role
@@ -156,7 +156,7 @@ export async function updateRole(
 
   return {
     ...role,
-    permissions: role.permissions as string[] as PermissionKey[],
+    permissions: JSON.parse(role.permissions) as PermissionKey[],
   };
 }
 
